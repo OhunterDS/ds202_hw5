@@ -37,67 +37,45 @@ sales <- readr::read_csv('2019_Iowa_Liquor_Sales.csv')
 ```
 
 ```{r}
-sales <- sales %>%
-  mutate_at(.vars = vars(Pack:`Volume Sold (Gallons)`),
-            .funs = funs(as.numeric))
+sales <- sales %>%  mutate_at(.vars = vars(Pack:`Volume Sold (Gallons)`),.funs = funs(as.numeric))
 ```
 
 ```{r}
-sales <- sales %>%
-  separate(Date, into = c('month', 'day', 'year'), sep = "/")
+sales <- sales %>% separate(Date, into = c('month', 'day', 'year'), sep = "/")
 ```
 
 ```{r}
-sales <- sales %>%
-  mutate_at(.vars = vars(month:year),
-            .funs = funs(as.numeric))
+sales <- sales %>% mutate_at(.vars = vars(month:year), .funs = funs(as.numeric))
 ```
 
 ```{r}
-sales <- sales %>%
-  mutate(`Store Location` = substr(`Store Location`, 8, nchar(`Store Location`) - 1))
+sales <- sales %>%  mutate(`Store Location` = substr(`Store Location`, 8, nchar(`Store Location`) - 1))
 ```
 
 ```{r}
-sales <- sales %>%
-  separate(`Store Location`, into = c('lat', 'long'), sep = ' ')
+sales <- sales %>% separate(`Store Location`, into = c('lat', 'long'), sep = ' ')
 ```
 
 3. First overview:
   a. Plot a scatterplot of lat and long of store locations.
   
 ```{r}
-sales %>%
-  ggplot(aes(x = long, y = lat)) +
-  geom_point() +
-  theme(axis.title = element_blank(),
-        axis.text = element_blank())
+sales %>%  ggplot(aes(x = long, y = lat)) +  geom_point() + theme(axis.title = element_blank(), axis.text = element_blank())
 ```
 
   
   b. Provide a visual breakdown of the liquor category (by `Category Name`). Include volume sold in the breakdown.
 
 ```{r}
-sales %>%
-  filter(!is.na(`Category Name`)) %>%
-  group_by(`Category Name`) %>%
-  summarize(volume = sum(`Volume Sold (Gallons)`)) %>%
-  ggplot(aes(x = `Category Name`, y = volume)) +
-  geom_bar(stat = "identity") +
-  coord_flip() +
-  theme(axis.text.y = element_text(size = 6))
+sales %>%  filter(!is.na(`Category Name`)) %>%  group_by(`Category Name`) %>% summarize(volume = sum(`Volume Sold (Gallons)`)) %>%  ggplot(aes(x = `Category Name`, y = volume)) +  geom_bar(stat = "identity") +  coord_flip() +  theme(axis.text.y = element_text(size = 6))
 ```
 
   
 4. Find the daily sales liquor sales in Ames in 2019. Summarize the number of sales, volume of liquor sold, and amount of money spent.
 
 ```{r}
-sales %>%
-  group_by(month, day) %>%
-  summarize(num_sales = n(), total_volume = sum(`Volume Sold (Gallons)`),
-            total_money = sum(`Sale (Dollars)`)) -> salesDaily
-salesDaily %>%
-  arrange(desc(total_volume))
+sales %>% group_by(month, day) %>%  summarize(num_sales = n(), total_volume = sum(`Volume Sold (Gallons)`),total_money = sum(`Sale (Dollars)`)) -> salesDaily 
+salesDaily %>% arrange(desc(total_volume))
 ```
 
 
@@ -105,19 +83,12 @@ salesDaily %>%
 
 
 ```{r}
-salesDaily <- salesDaily %>%
-  mutate(date = paste(month, day, "2019", sep = "/"))
-salesDaily <- salesDaily %>%
-  mutate(date = mdy(date))
+salesDaily <- salesDaily %>%  mutate(date = paste(month, day, "2019", sep = "/"))
+salesDaily <- salesDaily %>%  mutate(date = mdy(date))
 ```
 
 ```{r}
-salesDaily %>%
-  ggplot(aes(x = day, y = total_volume)) +
-  facet_wrap(. ~ month) +
-  geom_point() +
-  geom_smooth() +
-  ylim(0, 6000)
+salesDaily %>%  ggplot(aes(x = day, y = total_volume)) +facet_wrap(. ~ month) + geom_point() + geom_smooth() + ylim(0, 6000)
 ```
 
 
